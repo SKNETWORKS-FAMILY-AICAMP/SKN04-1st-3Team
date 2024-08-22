@@ -1,7 +1,6 @@
 import re
 import pandas as pd
 import psycopg2
-# import requests
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -29,9 +28,10 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 temp_cars = []
 temp_batteries = []
-
+urls = {}
 
 # 현대자동차 및 제네시스
+# 500 error
 # 배터리 제조사가 세군데인 차량 존재
 
 # brand_url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
@@ -72,12 +72,12 @@ batteries_ = [battery.text.strip().replace("\xa0", "") for battery in batteries]
 
 temp_cars.extend(cars_)
 temp_batteries.extend(batteries_)
+urls.update({"kia" : f"{brand_url}"})
 
 
 
 # KG 모빌리티
-# 배터리 정보 따로 없음
-
+# url problem : 세부 페이지 X
 
 
 # 르노
@@ -92,6 +92,8 @@ batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"renault" : f"{brand_url}"})
+
 
 
 # BMW
@@ -107,11 +109,12 @@ batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"bmw" : f"{brand_url}"})
 
 
 
 # 벤츠
-# ? table X
+# bs까지는 출력되나 select() 되지않음
 
 # brand_url = "https://www.mercedes-benz.co.kr/passengercars/electric-battery.html"
 # driver.get(brand_url)
@@ -132,8 +135,8 @@ temp_batteries.extend(batteries)
 brand_url = "https://www.audi.co.kr/kr/web/ko/aboutaudi/customerinfo/evbattery.html"
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
-table_class = "nm-module nm-tbl-red"
 
+table_class = "nm-module nm-tbl-red"
 table_class = replace_spaces(table_class)
 table = bs.select(f"div.{table_class} tr td")
 
@@ -142,14 +145,17 @@ batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"audi" : f"{brand_url}"})
+
+
 
 # 폭스바겐
-# 사이트 로그인을 해야함? 
+# 사이트 로그인을 해야함 (driver.get()을 했을 시)
 
 # brand_url = "https://www.volkswagen.co.kr/ko/Battery.html"
-
 # driver.get(brand_url)
 # bs = BeautifulSoup(driver.page_source, 'lxml')
+
 # table_class = "StyledContainer-sc-18harj2 eDqQLO"
 # table_class = replace_spaces("StyledContainer-sc-18harj2 eDqQLO")
 # # table_url
@@ -167,12 +173,12 @@ temp_batteries.extend(batteries)
 
 
 # 볼보
-# url problem > 배터리 정보 X
+# url problem : 세부 페이지 X
 
 
 
 # JEEP
-# ? table X
+# bs까지는 출력되나 select() 되지않음
 
 # brand_url = "https://www.jeep.co.kr/notice.html"
 # driver.get(brand_url)
@@ -189,33 +195,40 @@ temp_batteries.extend(batteries)
 
 
 # 폴스타
-# 사이트 2개로 나누어져있음
+# 폴스타2, 폴스타4 두 차량의 url이 각각 존재
+# 또한 각 차량에 대해 싱글 모터, 듀얼 모터 두 가지 버전 존재
+
+# 복잡함
 
 
 
 # 포르쉐
+# 빈 리스트 반환할 때 있음
+# select() -> p-text / p-text.hydrated
 
 brand_url = "https://www.porsche.com/korea/ko/accessoriesandservice/bev-battery-notice/"
-
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "PcomGrid__grid__f560b TextContent__double__a2a42"
 table_class = replace_spaces(table_class)
 
-table = bs.select(f"div.{table_class} p-text.hydrated")
+table = bs.select(f"div.{table_class} p-text")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"porsche" : f"{brand_url}"})
+
+
 
 # 렉서스
 
 brand_url = "https://www.lexus.co.kr/contents/electric-battery-notice/"
-
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
+
 table = bs.select("table.d-block-pc tbody td")
 
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
@@ -223,6 +236,9 @@ batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"lexus" : f"{brand_url}"})
+
+
 
 # 쉐보레
 # img파일임;
@@ -237,7 +253,6 @@ temp_batteries.extend(batteries)
 # 미니(BMW)
 
 brand_url = "https://www.mini.co.kr/ko_KR/home/news-and-brand/news/MINI-electric-car-maufacturer.html"
-
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
 
@@ -247,6 +262,9 @@ batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
 temp_cars.extend(cars)
 temp_batteries.extend(batteries)
+urls.update({"mini" : f"{brand_url}"})
+
+
 
 # 롤스로이스
 # url problem
@@ -254,26 +272,30 @@ temp_batteries.extend(batteries)
 
 
 # 지엠
+# 모델명과 연식 문자열 덧붙여 cars_with_model_year에 저장
 
 brand_url = "https://www.cadillac.co.kr/events/batteryannouncement"
 driver.get(brand_url)
-
 bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table = bs.select(f"div.col-con div.col-con div.col-con p")
-table
 
 cars = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 0]
-years = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 1]
-cars_with_model_year = [cars[i] + " " + years[i] for i in range(len(cars))]
+model_years = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 1]
+cars_with_model_year = [cars[i] + " " + model_years[i] for i in range(len(cars))]
 batteries = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 2]
 
 temp_cars.extend(cars_with_model_year)
 temp_batteries.extend(batteries)
+urls.update({"gm" : f"{brand_url}"})
 
-data_cars_batteries = {
-    'car' : temp_cars,
-    'battery' : temp_batteries
-}
 
-df = pd.DataFrame(data_cars_batteries)
+
+print(len(urls))
+
+# data_cars_batteries = {
+#     'car' : temp_cars,
+#     'battery' : temp_batteries
+# }
+
+# df = pd.DataFrame(data_cars_batteries)
