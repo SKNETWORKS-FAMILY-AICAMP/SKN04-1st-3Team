@@ -20,9 +20,24 @@ def replace_spaces(input_string):
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 # 현대자동차 및 제네시스
-# 500 err
+brand_url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
 
-url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
+table = bs.select("div.cont tbody td")
+
+cars = []
+batteries = []
+
+for i in range(2, len(table)):
+    if i>=9 and i<12:
+        batteries.append(table[i].text.strip())
+        continue
+    
+    if i%2 == 0:
+        cars.append(table[i].text.strip())
+    elif i%2 == 1:
+        batteries.append(table[i].text.strip())
 
 
 
