@@ -28,7 +28,8 @@ CREATE TABLE Battery_Producer (
 
 CREATE TABLE Date (
 	date_id	serial	NOT NULL,
-	date	TIMESTAMP	NULL	COMMENT "%Y-%m-%d %H:%M:%S"
+	date_	TIMESTAMP	NULL
+	-- COMMENT "%Y-%m-%d %H:%M:%S" 
 );
 
 CREATE TABLE Monthly (
