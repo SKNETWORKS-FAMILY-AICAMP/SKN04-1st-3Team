@@ -2,10 +2,22 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import folium
+
+plt.rcParams['font.family'] ='Malgun Gothic'
+plt.rcParams['axes.unicode_minus'] = False
 
 st.header('자동차 등록대수')
+st.divider()
+#-------------------
+
+st.subheader('시도 별 자동차 등록대수')
+latitude = 37.394946
+longitude = 127.111104
+
 
 st.divider()
+#-------------------
 
 st.subheader('년도 별 차량/전기차 등록대수 현황')
 years = np.arange(2020, 2025)
