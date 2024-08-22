@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# battery_producer()
+# conn = st.connection('postgresql', type='sql')
+# df = conn.query('SELECT * FROM battrty_producer', ttl=600)
 
-st.title("배터리제조사 ")
+st.title("배터리제조사")
 
 select_brand = st.selectbox(
     '확인하고 싶은 브랜드를 선택해주세요.',
