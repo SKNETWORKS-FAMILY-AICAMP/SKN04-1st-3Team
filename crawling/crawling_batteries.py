@@ -1,7 +1,7 @@
+import re
 import pandas as pd
 import psycopg2
-import requests
-import re
+# import requests
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -17,44 +17,61 @@ def replace_spaces(input_string):
     
     return result
 
+# conn = psycopg2.connect(
+#     host='localhost',
+#     database='postgres',
+#     user='postgres',
+#     password='9708'
+# )
+# cursor = conn.cursor()
+
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
+temp_cars = []
+temp_batteries = []
+
+
 # 현대자동차 및 제네시스
-brand_url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+# 배터리 제조사가 세군데인 차량 존재
 
-table = bs.select("div.cont tbody td")
+# brand_url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
-cars = []
-batteries = []
+# table = bs.select("div.cont tbody td")
 
-for i in range(2, len(table)):
-    if i>=9 and i<12:
-        batteries.append(table[i].text.strip())
-        continue
+# cars = []
+# batteries = []
+
+# for i in range(2, len(table)):
+#     if i>=9 and i<12:
+#         batteries.append(table[i].text.strip())
+#         continue
     
-    if i%2 == 0:
-        cars.append(table[i].text.strip())
-    elif i%2 == 1:
-        batteries.append(table[i].text.strip())
+#     if i%2 == 0:
+#         cars.append(table[i].text.strip())
+#     elif i%2 == 1:
+#         batteries.append(table[i].text.strip())
 
 
 
 # 기아
 
-brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311" # 브랜드 url
+brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311"
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
 
-table_class = "cmp-table__wrap grid-max spacing-pt6 spacing-pb8    fixed-scroll " # 테이블 url
+table_class = "cmp-table__wrap grid-max spacing-pt6 spacing-pb8    fixed-scroll "
 table_class = replace_spaces(table_class)
 
 cars = bs.select(f"div.{table_class} tbody th")
 batteries = bs.select(f"div.{table_class} tbody td")
 
-cars_ = [car.text.replace("\xa0", "") for car in cars]
-batteries_ = [battery.text.replace("\xa0", "") for battery in batteries]
+cars_ = [car.text.strip().replace("\xa0", "") for car in cars]
+batteries_ = [battery.text.strip().replace("\xa0", "") for battery in batteries]
+
+temp_cars.extend(cars_)
+temp_batteries.extend(batteries_)
 
 
 
@@ -73,6 +90,8 @@ table = bs.select("div.tbl_wrap tr td")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 
 # BMW
@@ -85,6 +104,9 @@ table_class = "cmp-embed"
 table = bs.select("div.cmp-embed td")
 cars = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
+
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 
 
@@ -99,12 +121,15 @@ batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
 # table = bs.select("div.wb-grid-container")
 # table
 
+# print(len(cars), len(batteries))
+# temp_cars.extend(cars)
+# temp_batteries.extend(batteries)
+
 
 
 # 아우디
 
 brand_url = "https://www.audi.co.kr/kr/web/ko/aboutaudi/customerinfo/evbattery.html"
-
 driver.get(brand_url)
 bs = BeautifulSoup(driver.page_source, 'lxml')
 table_class = "nm-module nm-tbl-red"
@@ -115,7 +140,8 @@ table = bs.select(f"div.{table_class} tr td")
 cars = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
 
-
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 # 폭스바겐
 # 사이트 로그인을 해야함? 
@@ -181,7 +207,8 @@ table = bs.select(f"div.{table_class} p-text.hydrated")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
-
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 # 렉서스
 
@@ -194,7 +221,8 @@ table = bs.select("table.d-block-pc tbody td")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
-
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 # 쉐보레
 # img파일임;
@@ -217,10 +245,12 @@ table = bs.select("table.table-item tbody td")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
 batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
-
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
 
 # 롤스로이스
 # url problem
+
 
 
 # 지엠
@@ -238,4 +268,12 @@ years = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 1]
 cars_with_model_year = [cars[i] + " " + years[i] for i in range(len(cars))]
 batteries = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 2]
 
+temp_cars.extend(cars_with_model_year)
+temp_batteries.extend(batteries)
 
+data_cars_batteries = {
+    'car' : temp_cars,
+    'battery' : temp_batteries
+}
+
+df = pd.DataFrame(data_cars_batteries)
