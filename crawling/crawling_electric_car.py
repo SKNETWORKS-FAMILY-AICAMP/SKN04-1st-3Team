@@ -25,7 +25,7 @@ data = [total_initial]
 electric_car_count = bs.select('tbody#tBodyList td')
 
 for start_index in range(38, len(electric_car_count), 19):
-    total_batch = [electric_car.text.replace('(', ' ').replace(')', '').split()[0] for electric_car in electric_car_count[start_index-19:start_index]]
+    total_batch = [int(electric_car.text.replace('(', ' ').replace(')', '').split()[0].replace(',', '')) for electric_car in electric_car_count[start_index-19:start_index]]
     data.append(total_batch)
 
 # 2015년도까지
@@ -36,8 +36,11 @@ for row in data:
     if len(row) > len(colunm):
         row.pop()
 
+
+
 total_electric = pd.DataFrame(data, columns=colunm)
 
-print(total_electric)
 
-#DB완성되면 연결예정
+
+
+
