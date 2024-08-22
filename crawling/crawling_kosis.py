@@ -1,5 +1,6 @@
 import json
 import requests
+import psycopg2
 
 API_KEY = 'YzFmMDk4ZDBhZjU0YjRlMWU2ZGQ2YjFjOTc5YWY4ZDc='
 
@@ -10,12 +11,23 @@ response = requests.get(url)
 results = json.loads(response.text)
 
 
-
-
 for i in range(len(results)):
-    PRD_DE = int(results[i]['PRD_DE'])
-    print(PRD_DE)
-    
+    PRD_DE = results[i]['PRD_DE']
+    count = results[i]['DT']
+    region = results[i]['C1_NM']
+
+    formatted_date = f"{PRD_DE[:4]}-{PRD_DE[4:6]}-01"
+
+    with psycopg2.connect(
+    host='localhost',
+    dbname='electr_vehicle',
+    user='postgres',
+    password='1234',
+    port=5432,
+    ) as conn:
+        with conn.cursor() as cur:
+            cur.execute(f'''INSERT INTO registerd_vehicle (id, region_name, registered_vehicles, date) VALUES ('{i+1}', '{region}','{count}','{formatted_date}')''')
+
     
     
     # DB만들어지면 연결예정
