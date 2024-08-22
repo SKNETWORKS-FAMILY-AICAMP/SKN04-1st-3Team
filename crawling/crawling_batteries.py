@@ -24,6 +24,8 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 url = "https://www.hyundai.com/kr/ko/digital-customer-support/notice/notice/detail?pwiImtrSn=13205&page=1"
 
+
+
 # 기아
 
 brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311" # 브랜드 url
@@ -40,52 +42,69 @@ cars_ = [car.text.replace("\xa0", "") for car in cars]
 batteries_ = [battery.text.replace("\xa0", "") for battery in batteries]
 
 
-# KG
+
+# KG 모빌리티
+# 배터리 정보 따로 없음
+
+
 
 # 르노
-# brand_url = "https://www.renault.co.kr/ko/inside/notice_view.jsp?idx=18&update2=2024-08-13" # 브랜드 url
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
-# # table_url = "tbl_wrap"
-# # bs
-# table = bs.select("div.tbl_wrap tr td")
-# cars = [table[i] for i in range(len(table)) if i%2 == 0]
-# batteries = [table[i] for i in range(len(table)) if i%2 == 1]
-# # print(len(cars), len(batteries))
-# # for i in range(len(cars)):
-# #     print(cars[i].text, batteries[i].text)
+
+brand_url = "https://www.renault.co.kr/ko/inside/notice_view.jsp?idx=18&update2=2024-08-13" # 브랜드 url
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
+
+table = bs.select("div.tbl_wrap tr td")
+cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
+
+
 
 # BMW
-# brand_url = "https://www.bmw.co.kr/ko/bmw-korea/privacy-policy/notice-new.html"
+
+brand_url = "https://www.bmw.co.kr/ko/bmw-korea/privacy-policy/notice-new.html"
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
+
+table_class = "cmp-embed"
+table = bs.select("div.cmp-embed td")
+cars = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
+
+
+
+# 벤츠
+# ? table X
+
+# brand_url = "https://www.mercedes-benz.co.kr/passengercars/electric-battery.html"
 # driver.get(brand_url)
 # bs = BeautifulSoup(driver.page_source, 'lxml')
 
-# table_class = "cmp-embed"
-# table = bs.select("div.cmp-embed tr td")
-# cars = [table[i] for i in range(2, len(table)) if i%2 == 0]
-# batteries = [table[i] for i in range(2, len(table)) if i%2 == 1]
-# for i in range(len(cars)):
-#     print(cars[i].text, batteries[i].text)
+# table_class = "wb-grid-container"
+# table = bs.select("div.wb-grid-container")
+# table
 
-# 벤츠
 
 
 # 아우디
-# brand_url = "https://www.audi.co.kr/kr/web/ko/aboutaudi/customerinfo/evbattery.html"
 
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
-# table_class = "nm-module nm-tbl-red"
-# table_class = replace_spaces(table_class)
-# table_class
-# table = bs.select(f"div.{table_class} tr td")
-# table
-# cars = [table[i] for i in range(2, len(table)) if i%2 == 0]
-# batteries = [table[i] for i in range(2, len(table)) if i%2 == 1]
-# for i in range(len(cars)):
-#     print(cars[i].text, batteries[i].text)
+brand_url = "https://www.audi.co.kr/kr/web/ko/aboutaudi/customerinfo/evbattery.html"
+
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
+table_class = "nm-module nm-tbl-red"
+
+table_class = replace_spaces(table_class)
+table = bs.select(f"div.{table_class} tr td")
+
+cars = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(2, len(table)) if i%2 == 1]
+
+
 
 # 폭스바겐
+# 사이트 로그인을 해야함? 
+
 # brand_url = "https://www.volkswagen.co.kr/ko/Battery.html"
 
 # driver.get(brand_url)
@@ -104,96 +123,104 @@ batteries_ = [battery.text.replace("\xa0", "") for battery in batteries]
 # for i in range(len(cars)):
 #     print(cars[i], batteries[i])
 
+
+
 # 볼보
-# url problem
+# url problem > 배터리 정보 X
+
+
 
 # JEEP
+# ? table X
+
+# brand_url = "https://www.jeep.co.kr/notice.html"
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
+
+# table = bs.select("div.tls")
+# table
+
 
 
 # 테슬라
-# 이상함
+# url problem
+
+
 
 # 폴스타
 # 사이트 2개로 나누어져있음
 
+
+
 # 포르쉐
-# 문제있음
-# brand_url = "https://www.porsche.com/korea/ko/accessoriesandservice/bev-battery-notice/"
 
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
+brand_url = "https://www.porsche.com/korea/ko/accessoriesandservice/bev-battery-notice/"
 
-# table_class = "PcomGrid__grid__f560b TextContent__double__a2a42"
-# table_class = replace_spaces(f"{table_class}")
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
 
-# table = bs.select(f"div.{table_class}")
-# len(table)
+table_class = "PcomGrid__grid__f560b TextContent__double__a2a42"
+table_class = replace_spaces(table_class)
+
+table = bs.select(f"div.{table_class} p-text.hydrated")
+cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
+
 
 
 # 렉서스
 
-# brand_url = "https://www.lexus.co.kr/contents/electric-battery-notice/"
+brand_url = "https://www.lexus.co.kr/contents/electric-battery-notice/"
 
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
+table = bs.select("table.d-block-pc tbody td")
 
-# table = bs.select("table.d-block-pc tr td")
-# cars = []
-# batteries = []
+cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
-# cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
-# batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
-# for i in range(len(cars)):
-#     print(cars[i], batteries[i])
+
 
 # 쉐보레
 # img파일임;
-# brand_url = "https://www.chevrolet.co.kr/events/ev-information"
 
-# driver.get(brand_url)
+
 
 # 재규어
-# ?
+# url problem
+
+
 
 # 미니(BMW)
-# brand_url = "https://www.mini.co.kr/ko_KR/home/news-and-brand/news/MINI-electric-car-maufacturer.html"
 
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
+brand_url = "https://www.mini.co.kr/ko_KR/home/news-and-brand/news/MINI-electric-car-maufacturer.html"
 
-# table = bs.select("table.table-item span.md-heading.md-fixedtext")
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
 
-# cars = []
-# batteries = []
+table = bs.select("table.table-item tbody td")
+cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
+batteries = [table[i].text.strip() for i in range(len(table)) if i%2 == 1]
 
-# cars = [table[i].text.strip() for i in range(1, len(table)) if i%2 == 0]
-# batteries = [table[i].text.strip() for i in range(1, len(table)) if i%2 == 1]
-# for i in range(len(cars)):
-#     print(cars[i])
-#     print(batteries[i])
+
 
 # 롤스로이스
+# url problem
 
 
 # 지엠
-# brand_url = "https://www.cadillac.co.kr/events/batteryannouncement"
-# driver.get(brand_url)
 
-# bs = BeautifulSoup(driver.page_source, 'lxml')
+brand_url = "https://www.cadillac.co.kr/events/batteryannouncement"
+driver.get(brand_url)
 
-# # table_url = "col-sm-12 col-sm-gut-no "
-# # table_url = replace_spaces_with_single_dot_ignore_trailing(table_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
 
-# table = bs.select(f"div.gb-body1")
-# table = table[1:-1]
-# len(table)
-# cars = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 0]
-# years = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 1]
-# batteries = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 2]
+table = bs.select(f"div.col-con div.col-con div.col-con p")
+table
 
-# cars = [cars[i] + " " + years[i] for i in range(len(cars))]
-# # len(cars)
-# for i in range(len(cars)):
-#     print(cars[i])
-#     print(batteries[i])
+cars = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 0]
+years = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 1]
+cars_with_model_year = [cars[i] + " " + years[i] for i in range(len(cars))]
+batteries = [table[i].text.strip() for i in range(3, len(table)) if i%3 == 2]
+
 
