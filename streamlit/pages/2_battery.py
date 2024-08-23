@@ -30,10 +30,10 @@ st.divider()
 
 query = """
 SELECT 
-    car, 
-    battery
+    public.batery.car, 
+    public.batery.battery
 FROM 
-    battery;
+    public.batery;
 """
 
 df = conn.query(query, ttl=600)
