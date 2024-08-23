@@ -15,8 +15,8 @@ st.divider()
 
 query = f"""
 SELECT 
-    public.electric_vehicle.vehicle_name AS vehicle_name, 
-    public.producer.producer_name AS producer_name,
+    public.battery.car AS vehicle_name, 
+    public.battery.producer_name AS producer_name,
     public.brand.brand_name AS brand_name
 FROM 
     public.brand
