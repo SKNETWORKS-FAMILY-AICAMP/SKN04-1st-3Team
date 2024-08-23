@@ -158,31 +158,32 @@ with col[1]:
     color_scale = folium.LinearColormap(colors=['#FFEDA0', '#FEB24C', '#F03B20'], 
                                         vmin=df_ecar['registered'].min(), 
                                         vmax=df_ecar['registered'].max())
-
+    
     # GeoJSON 데이터와 데이터프레임 결합하여 지도에 데이터 추가
     for feature in geo_data['features']:
         region_name = feature['properties']['CTP_KOR_NM']
-        region_data = df_selected_year[df_selected_year['region'] == region_name]
-        
-        if not region_data.empty:
-            value = region_data['registered'].iloc[0]
-            color = color_scale(value)
+        if ('북도' in region_name) or ('남도' in region_name):
+            region_name = region_name[0]+region_name[2]
         else:
-            value = 0
-            color = '#f0f0f0'
+            region_name = region_name[:2]
             
-            folium.GeoJson(
-                feature,
-                style_function=lambda x, color=color: {
-                    'fillColor': color,
-                    'color': 'black',
-                    'weight': 1,
-                    'fillOpacity': 0.7,
-                },
-                tooltip=folium.Tooltip(f"{region_name}: {value}"),
-                highlight_function=lambda x: {'color': 'white', 'weight': 3, 'fillOpacity': 0.9}
-            ).add_to(m)
-    
+        region_data = df_selected_year[df_selected_year['region'] == region_name]
+        if not region_data.empty:
+                value = region_data['registered'].iloc[0]
+                color = color_scale(value)
+            
+                folium.GeoJson(
+                    feature,
+                    style_function=lambda x, color=color: {
+                        'fillColor': color,
+                        'color': 'black',
+                        'weight': 1,
+                        'fillOpacity': 0.7,
+                    },
+                    tooltip=folium.Tooltip(f"{region_name}: {value}"),
+                    highlight_function=lambda x: {'color': 'white', 'weight': 3, 'fillOpacity': 0.9}
+                ).add_to(m)
+        
     color_scale.add_to(m)
     st.components.v1.html(m._repr_html_(), width=570, height=900)
 
