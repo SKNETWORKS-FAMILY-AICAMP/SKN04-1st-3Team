@@ -289,9 +289,7 @@ temp_cars.extend(cars_with_model_year)
 temp_batteries.extend(batteries)
 urls.update({"gm" : f"{brand_url}"})
 
-
-
-print(len(urls))
+print(len(temp_cars), len(temp_batteries), len(urls))
 
 # data_cars_batteries = {
 #     'car' : temp_cars,
