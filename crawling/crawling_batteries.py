@@ -55,8 +55,9 @@ driver = init_driver()
 # 기아
 
 brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "cmp-table__wrap grid-max spacing-pt6 spacing-pb8    fixed-scroll "
 table_class = replace_spaces(table_class)
@@ -80,8 +81,9 @@ urls.update({"kia" : f"{brand_url}"})
 # 르노
 
 brand_url = "https://www.renault.co.kr/ko/inside/notice_view.jsp?idx=18&update2=2024-08-13" # 브랜드 url
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table = bs.select("div.tbl_wrap tr td")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
@@ -96,8 +98,9 @@ urls.update({"renault" : f"{brand_url}"})
 # BMW
 
 brand_url = "https://www.bmw.co.kr/ko/bmw-korea/privacy-policy/notice-new.html"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "cmp-embed"
 table = bs.select("div.cmp-embed td")
@@ -130,8 +133,9 @@ urls.update({"bmw" : f"{brand_url}"})
 # 아우디
 
 brand_url = "https://www.audi.co.kr/kr/web/ko/aboutaudi/customerinfo/evbattery.html"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "nm-module nm-tbl-red"
 table_class = replace_spaces(table_class)
@@ -196,8 +200,9 @@ urls.update({"audi" : f"{brand_url}"})
 # 또한 각 차량에 대해 싱글 모터, 듀얼 모터 두 가지 버전 존재
 
 brand_url = "https://www.polestar.com/kr/polestar-2/specifications/#charging"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_cars = bs.select("tr.css-1xdhyk6 th")
 table_batteries = bs.select("p.css-11zwe5n") # table[22], table[23]
@@ -218,8 +223,9 @@ urls.update({"polestar2" : f"{brand_url}"})
 # select() -> p-text / p-text.hydrated
 
 brand_url = "https://www.porsche.com/korea/ko/accessoriesandservice/bev-battery-notice/"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "PcomGrid__grid__f560b TextContent__double__a2a42"
 table_class = replace_spaces(table_class)
@@ -237,8 +243,9 @@ urls.update({"porsche" : f"{brand_url}"})
 # 렉서스
 
 brand_url = "https://www.lexus.co.kr/contents/electric-battery-notice/"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table = bs.select("table.d-block-pc tbody td")
 
@@ -272,8 +279,9 @@ batteries = ["LG에너지솔루션", "LG에너지솔루션"]
 # 미니(BMW)
 
 brand_url = "https://www.mini.co.kr/ko_KR/home/news-and-brand/news/MINI-electric-car-maufacturer.html"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table = bs.select("table.table-item tbody td")
 cars = [table[i].text.strip() for i in range(len(table)) if i%2 == 0]
@@ -294,8 +302,9 @@ urls.update({"mini" : f"{brand_url}"})
 # 모델명과 연식 문자열 덧붙여 cars_with_model_year에 저장
 
 brand_url = "https://www.cadillac.co.kr/events/batteryannouncement"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+bs = get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table = bs.select(f"div.col-con div.col-con div.col-con p")
 
