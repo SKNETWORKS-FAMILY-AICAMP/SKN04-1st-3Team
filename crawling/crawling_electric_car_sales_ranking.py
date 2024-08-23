@@ -48,4 +48,25 @@ for i in range(0, 3):
         })
 
 df = pd.DataFrame(results)
-df.to_csv('results.csv', index=False)
+print(df)
+
+from sqlalchemy import create_engine
+from sqlalchemy.types import Integer, String, FLOAT
+db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/electr_vehicle'
+
+engine = create_engine(db_url, echo=True)
+
+df.to_sql(
+    'top_rank',
+    engine,
+    if_exists='replace', # replace: 덮어쓰기
+    index=False,
+    chunksize=5000,
+    dtype={              # 데이터 열의 데이터 유형
+            '연도': String,
+            '차종': String,
+            '판매대수': Integer,
+            '증감율': FLOAT,
+            
+        }
+    )
