@@ -198,7 +198,21 @@ urls.update({"audi" : f"{brand_url}"})
 # 폴스타2, 폴스타4 두 차량의 url이 각각 존재
 # 또한 각 차량에 대해 싱글 모터, 듀얼 모터 두 가지 버전 존재
 
-# 복잡함
+brand_url = "https://www.polestar.com/kr/polestar-2/specifications/#charging"
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
+
+table_cars = bs.select("tr.css-1xdhyk6 th")
+table_batteries = bs.select("p.css-11zwe5n") # table[22], table[23]
+
+cars = [table_cars[2].text, table_cars[3].text]
+batteries = [table_batteries[22].text, table_batteries[23].text]
+
+temp_cars.extend(cars)
+temp_batteries.extend(batteries)
+urls.update({"polestar2" : f"{brand_url}"})
+
+
 
 
 
@@ -241,7 +255,15 @@ urls.update({"lexus" : f"{brand_url}"})
 
 
 # 쉐보레
-# img파일임;
+# img file -> 직접 입력
+
+brand_url = "https://www.chevrolet.co.kr/events/ev-information"
+driver.get(brand_url)
+
+cars = ["BOLT EUV", "BOLT EV"]
+model_years = ["MY22 ~ MY23", "MY17 ~ MY23"]
+cars_with_model_year = [cars[i] + " " + model_years[i] for i in range(len(cars))]
+batteries = ["LG에너지솔루션", "LG에너지솔루션"]
 
 
 
