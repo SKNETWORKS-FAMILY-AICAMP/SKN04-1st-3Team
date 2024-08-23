@@ -291,9 +291,10 @@ urls.update({"gm" : f"{brand_url}"})
 
 print(len(temp_cars), len(temp_batteries), len(urls))
 
-# data_cars_batteries = {
-#     'car' : temp_cars,
-#     'battery' : temp_batteries
-# }
+data_cars_batteries = {
+   'car' : temp_cars,
+     'battery' : temp_batteries
+ }
 
-# df = pd.DataFrame(data_cars_batteries)
+df = pd.DataFrame(data_cars_batteries)
+
