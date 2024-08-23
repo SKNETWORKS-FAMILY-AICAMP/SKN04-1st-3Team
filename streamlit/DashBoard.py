@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import folium
 import json
 import altair as alt
-
+from sqlalchemy import create_engine
 
 # Streamlit 페이지 설정
 st.set_page_config(
@@ -27,13 +27,42 @@ st.divider()
 #-------------------
 
 st.subheader('년도 별 차량/전기차 등록대수 현황')
-import streamlit as st
-from streamlit_echarts import st_echarts
 
-# 데이터 설정
-years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
-total_vehicle_registrations = [20000000, 20500000, 21000000, 21500000, 22000000, 22500000, 23000000, 23500000, 24000000]
-ev_registrations = [50000, 100000, 150000, 250000, 350000, 500000, 700000, 900000, 1200000]
+# 데이터 로드
+conn = st.connection('postgresql', type='sql')
+
+query = f"""
+SELECT 
+    public.vehicle_data.year AS year, 
+    public.vehicle_data.value AS registered,
+    public.vehicle_data.region AS region
+FROM 
+    public.vehicle_data
+"""
+
+df_car = conn.query(query, ttl=600)
+
+df_car_pivot = df_car.pivot(index='year', columns='region', values='registered').reset_index()
+
+df_car_pivot['year'] = df_car_pivot['year'].astype('int')
+
+df_car_pivot['total'] = df_car_pivot.iloc[:,1:].sum(axis=1)/10000
+
+query = f"""
+SELECT 
+    "연월" AS year, 
+    public.electric_vehicles."Value" AS registered,
+    public.electric_vehicles."Region" AS region
+FROM 
+    public.electric_vehicles
+"""
+
+df_ecar = conn.query(query, ttl=600)
+
+df_ecar_pivot = df_ecar.pivot(index='year', columns='region', values='registered').reset_index()
+
+df_ecar_pivot['total'] = df_ecar_pivot.iloc[:,1:].sum(axis=1)/10000
+
 
 # ECharts 옵션 설정
 options = {
@@ -49,7 +78,7 @@ options = {
     "xAxis": {
         "type": 'category',
         "boundaryGap": False,
-        "data": years
+        "data": df_car_pivot['year'].to_list()
     },
     "yAxis": {
         "type": 'value'
@@ -58,13 +87,13 @@ options = {
         {
             "name": 'Total Vehicles',
             "type": 'line',
-            "data": total_vehicle_registrations,
+            "data": df_car_pivot['total'].to_list(),
             "smooth": True,
         },
         {
             "name": 'Electric Vehicles',
             "type": 'line',
-            "data": ev_registrations,
+            "data": df_ecar_pivot['total'].to_list(),
             "smooth": True,
         }
     ]
@@ -84,38 +113,32 @@ geo_path = 'SIDO_MAP.json'
 with open(geo_path, encoding='utf-8') as f:
     geo_data = json.load(f)
 
-year_list = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
-
-
 # 데이터 필터링
 # 데이터 구성
-regions = ['서울특별시', '경기도', '인천광역시', '부산광역시', '대구광역시', '대전광역시', '광주광역시', '울산광역시', '강원도', '충청북도', '충청남도', '전라북도', '전라남도', '경상북도', '경상남도', '제주특별자치도']
-years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
-
-# 연도별로 데이터를 반복하여 각 지역에 다른 값 할당
-data = []
-for year in years:
-    values = list(range(10000, 26000, 1000))  # 각 지역별로 다르게 증가하는 값 예제
-    for region, value in zip(regions, values):
-        data.append({'year': year, 'region': region, 'value': value})
-
-# 데이터프레임 생성
-df = pd.DataFrame(data)
+# df_cars = pd.merge(df_car, df_ecar, how='left', on='year', suffixes=('_car', '_elec_car'))
 
 # Sidebar 설정
-with st.slider:
+with st.sidebar:
     st.title('🚗 Korea Dashboard')
     
-    year_list = list(df['year'].unique())[::-1]
+    year_list = list(df_ecar['year'].unique())[::-1]
     selected_year = st.selectbox('Select a year', year_list, index=len(year_list)-1)
-    df_selected_year = df[df['year'] == selected_year]
-    df_selected_year_sorted = df_selected_year.sort_values(by="value", ascending=False)
+    df_selected_year = df_ecar[df_ecar['year'] == selected_year]
+    df_selected_year_sorted = df_selected_year.sort_values(by="registered", ascending=False)[:5]
 
 # Streamlit에서 2개의 컬럼 생성
-col = st.columns((0.8, 0.2), gap='medium')
+col = st.columns((0.2, 0.8), gap='medium')
 
 # 지도 그리기
 with col[0]:
+    st.markdown('#### Top States')
+
+    st.dataframe(df_selected_year_sorted,
+                 column_order=("region", "value"),
+                 hide_index=True,
+                 width=None)
+
+with col[1]:
     st.subheader('시도 별 자동차 등록대수')
     latitude = 36.2
     longitude = 127.5
@@ -133,8 +156,8 @@ with col[0]:
 
     # 색상 스케일 설정
     color_scale = folium.LinearColormap(colors=['#FFEDA0', '#FEB24C', '#F03B20'], 
-                                        vmin=df['value'].min(), 
-                                        vmax=df['value'].max())
+                                        vmin=df_ecar['registered'].min(), 
+                                        vmax=df_ecar['registered'].max())
 
     # GeoJSON 데이터와 데이터프레임 결합하여 지도에 데이터 추가
     for feature in geo_data['features']:
@@ -142,7 +165,7 @@ with col[0]:
         region_data = df_selected_year[df_selected_year['region'] == region_name]
         
         if not region_data.empty:
-            value = region_data['value'].iloc[0]
+            value = region_data['registered'].iloc[0]
             color = color_scale(value)
             
             folium.GeoJson(
@@ -160,59 +183,12 @@ with col[0]:
     color_scale.add_to(m)
     st.components.v1.html(m._repr_html_(), width=570, height=900)
 
-# 도넛 차트 및 증감표 추가
-with col[1]:
-    st.markdown('#### Top States')
-
-    st.dataframe(df_selected_year_sorted,
-                 column_order=("region", "value"),
-                 hide_index=True,
-                 width=None)
-
-    st.subheader('도넛 차트')
-    def make_donut(input_response, input_text, input_color):
-        chart_color = {
-            'blues': ['#29b5e8', '#155F7A'],
-            'greens': ['#27AE60', '#12783D'],
-            'reds': ['#E74C3C', '#781F16'],
-            'oranges': ['#F39C12', '#875A12']
-        }
-        
-        source = pd.DataFrame({
-            "Topic": ['', input_text],
-            "% value": [100-input_response, input_response]
-        })
-        
-        plot = alt.Chart(source).mark_arc(innerRadius=45, cornerRadius=25).encode(
-            theta="% value",
-            color=alt.Color("Topic:N",
-                            scale=alt.Scale(
-                                domain=[input_text, ''],
-                                range=chart_color[input_color]),
-                            legend=None),
-        ).properties(width=130, height=130)
-        
-        text = plot.mark_text(align='center', color=chart_color[input_color][0], fontSize=32, fontWeight=700).encode(
-            text=alt.value(f'{input_response} %')
-        )
-        
-        return plot + text
-
-    response_value = 75  # 임시 값, 실제 데이터로 바꾸세요
-    st.altair_chart(make_donut(response_value, 'Electric Vehicles', selected_color_theme), use_container_width=True)
-
-    with st.expander('About', expanded=True):
-        st.write('''
-            - Data: [Korea Vehicle Registration Data](https://example.com).
-            - :orange[**Gains/Losses**]: Year-over-year change.
-            - :orange[**Threshold**]: Values > 50,000 are highlighted.
-            ''')
 
 st.divider()
 
 
 # with st.sidebar:
-#     st.title('🏂 Korea Dashboard')
+#     
     
 #     year_list = list(df_reshaped.year.unique())[::-1]
     
