@@ -37,11 +37,10 @@ def fetch_car_data():
             row.pop()
 
 
-
     total_electric = pd.DataFrame(data, columns=colunm)
-
-
 
     df_long = pd.melt(total_electric, id_vars=['연월'], var_name='Region', value_name='Value')
 
+
     return df_long
+
