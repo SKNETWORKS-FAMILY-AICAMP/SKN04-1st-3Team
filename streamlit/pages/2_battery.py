@@ -13,24 +13,40 @@ select_brand = st.selectbox(
 
 st.divider()
 
-query = f"""
+#브랜드별 차종과 배터리 제조사를 보여주는 쿼리입니당
+# query = f"""
+# SELECT 
+#     public.electric_vehicle.vehicle_name AS vehicle_name, 
+#     public.producer.producer_name AS producer_name,
+#     public.brand.brand_name AS brand_name
+# FROM 
+#     public.brand
+# JOIN 
+#     public.electric_vehicle ON public.brand.brand_id = public.electric_vehicle.brand_id
+# JOIN 
+#     public.producer ON public.electric_vehicle.producer_id = public.producer.producer_id;
+# """
+
+
+query = """
 SELECT 
-    public.electric_vehicle.vehicle_name AS vehicle_name, 
-    public.producer.producer_name AS producer_name,
-    public.brand.brand_name AS brand_name
+    public.batery.car, 
+    public.batery.battery
 FROM 
-    public.brand
-JOIN 
-    public.electric_vehicle ON public.brand.brand_id = public.electric_vehicle.brand_id
-JOIN 
-    public.producer ON public.electric_vehicle.producer_id = public.producer.producer_id;
+    public.batery;
 """
 
 df = conn.query(query, ttl=600)
 
-tmp_df = df[df['brand_name'] == select_brand]
+#tmp_df = df[df['brand_name'] == select_brand]
 
-if tmp_df.empty:
-    st.write("선택한 브랜드에 대한 정보가 없습니다.")
+# if df.empty:
+#     st.write("선택한 브랜드에 대한 정보가 없습니다.")
+# else:
+#     st.table(df[['vehicle_name', 'producer_name']].rename(columns={'car': '차종', 'battery': '제조사'}))
+
+if df.empty:
+    st.write("배터리 정보가 없습니다.")
 else:
-    st.table(tmp_df[['vehicle_name', 'producer_name']].rename(columns={'vehicle_name': '차종', 'producer_name': '제조사'}))
+    # 테이블로 표시
+    st.table(df.rename(columns={'car': '차종', 'battery': '제조사'}))
