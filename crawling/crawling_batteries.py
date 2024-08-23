@@ -55,9 +55,8 @@ driver = init_driver()
 # 기아
 
 brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311"
-get_page_source(driver, brand_url)
-# driver.get(brand_url)
-# bs = BeautifulSoup(driver.page_source, 'lxml')
+driver.get(brand_url)
+bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "cmp-table__wrap grid-max spacing-pt6 spacing-pb8    fixed-scroll "
 table_class = replace_spaces(table_class)
