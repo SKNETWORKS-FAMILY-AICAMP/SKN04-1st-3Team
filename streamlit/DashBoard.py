@@ -103,19 +103,27 @@ for year in years:
 df = pd.DataFrame(data)
 
 # Sidebar 설정
-with st.slider:
+with st.sidebar:
     st.title('🚗 Korea Dashboard')
     
     year_list = list(df['year'].unique())[::-1]
     selected_year = st.selectbox('Select a year', year_list, index=len(year_list)-1)
     df_selected_year = df[df['year'] == selected_year]
-    df_selected_year_sorted = df_selected_year.sort_values(by="value", ascending=False)
+    df_selected_year_sorted = df_selected_year.sort_values(by="value", ascending=False)[:5]
 
 # Streamlit에서 2개의 컬럼 생성
-col = st.columns((0.8, 0.2), gap='medium')
+col = st.columns((0.2, 0.8), gap='medium')
 
 # 지도 그리기
 with col[0]:
+    st.markdown('#### Top States')
+
+    st.dataframe(df_selected_year_sorted,
+                 column_order=("region", "value"),
+                 hide_index=True,
+                 width=None)
+
+with col[1]:
     st.subheader('시도 별 자동차 등록대수')
     latitude = 36.2
     longitude = 127.5
@@ -160,59 +168,12 @@ with col[0]:
     color_scale.add_to(m)
     st.components.v1.html(m._repr_html_(), width=570, height=900)
 
-# 도넛 차트 및 증감표 추가
-with col[1]:
-    st.markdown('#### Top States')
-
-    st.dataframe(df_selected_year_sorted,
-                 column_order=("region", "value"),
-                 hide_index=True,
-                 width=None)
-
-    st.subheader('도넛 차트')
-    def make_donut(input_response, input_text, input_color):
-        chart_color = {
-            'blues': ['#29b5e8', '#155F7A'],
-            'greens': ['#27AE60', '#12783D'],
-            'reds': ['#E74C3C', '#781F16'],
-            'oranges': ['#F39C12', '#875A12']
-        }
-        
-        source = pd.DataFrame({
-            "Topic": ['', input_text],
-            "% value": [100-input_response, input_response]
-        })
-        
-        plot = alt.Chart(source).mark_arc(innerRadius=45, cornerRadius=25).encode(
-            theta="% value",
-            color=alt.Color("Topic:N",
-                            scale=alt.Scale(
-                                domain=[input_text, ''],
-                                range=chart_color[input_color]),
-                            legend=None),
-        ).properties(width=130, height=130)
-        
-        text = plot.mark_text(align='center', color=chart_color[input_color][0], fontSize=32, fontWeight=700).encode(
-            text=alt.value(f'{input_response} %')
-        )
-        
-        return plot + text
-
-    response_value = 75  # 임시 값, 실제 데이터로 바꾸세요
-    st.altair_chart(make_donut(response_value, 'Electric Vehicles', selected_color_theme), use_container_width=True)
-
-    with st.expander('About', expanded=True):
-        st.write('''
-            - Data: [Korea Vehicle Registration Data](https://example.com).
-            - :orange[**Gains/Losses**]: Year-over-year change.
-            - :orange[**Threshold**]: Values > 50,000 are highlighted.
-            ''')
 
 st.divider()
 
 
 # with st.sidebar:
-#     st.title('🏂 Korea Dashboard')
+#     
     
 #     year_list = list(df_reshaped.year.unique())[::-1]
     
