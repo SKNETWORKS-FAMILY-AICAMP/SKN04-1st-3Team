@@ -311,11 +311,13 @@ temp_cars.extend(cars_with_model_year)
 temp_batteries.extend(batteries)
 urls.update({"gm" : f"{brand_url}"})
 
-print(len(temp_cars), len(temp_batteries), len(urls))
+# print(len(temp_cars), len(temp_batteries), len(urls))
 
-# data_cars_batteries = {
-#     'car' : temp_cars,
-#     'battery' : temp_batteries
-# }
+data_cars_batteries = {
+    'car' : temp_cars,
+    'battery' : temp_batteries
+}
 
-# df = pd.DataFrame(data_cars_batteries)
+df = pd.DataFrame(data_cars_batteries)
+df.to_csv("data_cars_batteries.csv", index=False)
+
