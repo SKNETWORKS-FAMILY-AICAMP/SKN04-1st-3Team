@@ -1,9 +1,7 @@
 import re
 import pandas as pd
-import psycopg2
 
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -16,19 +14,18 @@ def replace_spaces(input_string):
     
     return result
 
-# conn = psycopg2.connect(
-#     host='localhost',
-#     database='postgres',
-#     user='postgres',
-#     password='9708'
-# )
-# cursor = conn.cursor()
+def init_driver():
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+def get_page_source(driver, url):
+    driver.get(url)
+    return BeautifulSoup(driver.page_source, 'lxml')
 
 temp_cars = []
 temp_batteries = []
 urls = {}
+
+driver = init_driver()
 
 # 현대자동차 및 제네시스
 # 500 error
@@ -58,8 +55,9 @@ urls = {}
 # 기아
 
 brand_url = "https://www.kia.com/kr/customer-service/notice/notice-202407311"
-driver.get(brand_url)
-bs = BeautifulSoup(driver.page_source, 'lxml')
+get_page_source(driver, brand_url)
+# driver.get(brand_url)
+# bs = BeautifulSoup(driver.page_source, 'lxml')
 
 table_class = "cmp-table__wrap grid-max spacing-pt6 spacing-pb8    fixed-scroll "
 table_class = replace_spaces(table_class)
