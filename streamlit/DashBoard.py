@@ -134,7 +134,7 @@ with col[0]:
     st.markdown('#### Top States')
 
     st.dataframe(df_selected_year_sorted,
-                 column_order=("region", "value"),
+                 column_order=("region", "registered"),
                  hide_index=True,
                  width=None)
 
@@ -167,6 +167,9 @@ with col[1]:
         if not region_data.empty:
             value = region_data['registered'].iloc[0]
             color = color_scale(value)
+        else:
+            value = 0
+            color = '#f0f0f0'
             
             folium.GeoJson(
                 feature,
