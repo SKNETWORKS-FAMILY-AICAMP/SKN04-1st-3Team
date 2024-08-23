@@ -30,14 +30,14 @@ st.subheader('년도 별 차량/전기차 등록대수 현황')
 
 # 데이터 로드
 # secrets.toml에서 정보 가져오기
-username = st.secrets["db_username"]
-password = st.secrets["db_password"]
-host = st.secrets["db_host"]
-port = st.secrets["db_port"]
-database_name = st.secrets["db_name"]
+username = st.secrets["username"]
+password = st.secrets["password"]
+host = st.secrets["host"]
+port = st.secrets["port"]
+database_name = st.secrets["database"]
 
 # 데이터베이스 URL 구성
-DATABASE_URL = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/electr_vehicle"
+DATABASE_URL = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database_name}"
 
 # SQLAlchemy 엔진 생성
 engine = create_engine(DATABASE_URL)
