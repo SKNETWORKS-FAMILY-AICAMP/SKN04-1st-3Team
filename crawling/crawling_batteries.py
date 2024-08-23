@@ -296,5 +296,6 @@ data_cars_batteries = {
      'battery' : temp_batteries
  }
 
-df = pd.DataFrame(data_cars_batteries)
-
+def return_df():
+    df = pd.DataFrame(data_cars_batteries)
+    return df
