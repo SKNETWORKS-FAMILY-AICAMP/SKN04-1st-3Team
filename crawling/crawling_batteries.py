@@ -25,6 +25,12 @@ def fetch_():
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
+<<<<<<< HEAD
+=======
+def return_df():
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+
+>>>>>>> 93181b2e5bb45a09f5bca65baa07c10fc242cf17
     temp_cars = []
     temp_batteries = []
     urls = {}
@@ -296,4 +302,6 @@ def fetch_():
     }
 
     df = pd.DataFrame(data_cars_batteries)
+
     return df
+  
