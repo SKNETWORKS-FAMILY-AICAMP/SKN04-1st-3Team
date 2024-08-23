@@ -1,4 +1,3 @@
-
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -43,7 +42,8 @@ total_electric = pd.DataFrame(data, columns=colunm)
 
 
 
-print(total_electric)
+df_long = pd.melt(total_electric, id_vars=['연월'], var_name='Region', value_name='Value')
+
 
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, String
@@ -52,30 +52,17 @@ db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/electr_vehicle'
 
 engine = create_engine(db_url, echo=True)
 
-total_electric.to_sql(
-    'electric_vehicles',
-    engine,
-    if_exists='replace', # replace: 덮어쓰기
-    index=False,
-    chunksize=5000,
-    dtype={              # 데이터 열의 데이터 유형
-            '연도': String,
-            '서울': Integer,
-            '부산': Integer,
-            '대구': Integer,
-            '인천': Integer,
-            '광주': Integer,
-            '대전': Integer,
-            '울산': Integer,
-            '세종': Integer,
-            '경기': Integer,
-            '강원': Integer,
-            '충북': Integer,
-            '충남': Integer,
-            '전북': Integer,
-            '전남': Integer,
-            '경북': Integer,
-            '경남': Integer,
-            '제주': Integer,
-        }
-    )
+df_long.to_sql(
+  'electric_vehicles',
+  engine,
+  if_exists='replace', # replace: 덮어쓰기
+  index=False,
+  chunksize=5000,
+  dtype={              # 데이터 열의 데이터 유형
+      
+        'year': String,
+        'value': Integer,
+        'region': String,
+        
+    }
+)
