@@ -48,7 +48,7 @@ df_long = pd.melt(total_electric, id_vars=['연월'], var_name='Region', value_n
 from sqlalchemy import create_engine
 from sqlalchemy.types import Integer, String
 
-db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/electr_vehicle'
+db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/electric_vehicle'
 
 engine = create_engine(db_url, echo=True)
 
