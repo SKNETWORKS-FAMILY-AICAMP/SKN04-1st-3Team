@@ -21,13 +21,13 @@ cursor = conn.cursor()
 
 # 2. 필요한 데이터베이스 생성 (예: 'my_database')
 database_name = "electr_vehicle"
-cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name)))
+# cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name)))
 
 # 3. 연결을 종료하고 생성한 데이터베이스로 다시 연결
 cursor.close()
 conn.close()
 
-db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/postgres'
+db_url = 'postgresql+psycopg2://postgres:1234@localhost:5432/electr_vehicle'
 
 engine = create_engine(db_url, echo=True)
 
@@ -35,8 +35,7 @@ vehicle_data = fetch_kosis_data()
 electric_vehicles = fetch_car_data()
 battery = fetch_()
 
-
-df.to_sql(
+vehicle_data.to_sql(
   'vehicle_data',
   engine,
   if_exists='replace', # replace: 덮어쓰기
@@ -50,7 +49,7 @@ df.to_sql(
     }
 )
 
-df_long.to_sql(
+electric_vehicles.to_sql(
   'electric_vehicles',
   engine,
   if_exists='replace', # replace: 덮어쓰기
@@ -64,4 +63,16 @@ df_long.to_sql(
         
     }
 )
-    
+
+battery.to_sql(
+  'battery',
+  engine,
+  if_exists='replace', # replace: 덮어쓰기
+  index=False,
+  chunksize=5000,
+  dtype={              # 데이터 열의 데이터 유형
+      
+        'car': String,
+        'battery': String,
+    }
+)
